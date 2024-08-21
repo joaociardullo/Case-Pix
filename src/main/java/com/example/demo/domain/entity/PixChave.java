@@ -1,6 +1,7 @@
 package com.example.demo.domain.entity;
 
 import com.example.demo.domain.enums.CHAVEENUM;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -40,7 +41,16 @@ public class PixChave {
     private String sobreNomeCorrentista;
 
     @Column(name = "dataRegistro")
+    @JsonFormat(pattern = "dd-MM-yyyy HH:mm:ss")
     private LocalDateTime dataRegistro;
+
+    @Column(name = "dataRegistro", insertable = false, updatable = false)
+    @JsonFormat(pattern = "dd-MM-yyyy HH:mm:ss")
+    private String dataInclusao;
+
+    @JsonFormat(pattern = "dd-MM-yyyy HH:mm:ss")
+    @Column(name = "dataInativacao", insertable = false, updatable = false)
+    private String dataInativacao;
 
     public Boolean isInativa() {
         if (tipoChave == CHAVEENUM.INATIVA.getDescricao()) {
