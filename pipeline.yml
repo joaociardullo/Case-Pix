@@ -1,0 +1,26 @@
+pipeline:
+  image: openjdk:17
+
+stages:
+  - build
+  - test
+  - deploy
+
+build:
+  stage: build
+  script:
+    - mvn clean package
+  artifacts:
+    paths:
+      - target/*.jar
+
+test:
+  stage: test
+  script:
+    - mvn test
+
+deploy:
+  stage: deploy
+  script:
+    - docker build -t my-java-app .
+    - docker run -p 8080:8080 my-java-app
