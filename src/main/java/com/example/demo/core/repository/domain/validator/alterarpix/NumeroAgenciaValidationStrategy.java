@@ -1,0 +1,14 @@
+package com.example.demo.core.repository.domain.validator.alterarpix;
+
+import com.example.demo.core.repository.domain.request.PixChaveRequest;
+import com.example.demo.core.repository.exceptions.ResourceNotFoundException;
+
+public class NumeroAgenciaValidationStrategy implements ValidationStrategy {
+    @Override
+    public void validate(PixChaveRequest request) {
+        String numeroAgencia = Integer.toString(request.getNumeroAgencia());
+        if (!numeroAgencia.matches("\\d{4}")) {
+            throw new ResourceNotFoundException("Tipo de agencia invalida");
+        }
+    }
+}
