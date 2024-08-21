@@ -43,7 +43,7 @@ public class PixServiceImpl implements PixService {
             // Validar valor da chave
             if (request.getTipoChave().equals("celular")) {
                 // Validar código país, DDD e número
-                if (!request.getValorChave().startsWith("+") || request.getValorChave().length() != 13) {
+                if (!request.getValorChave().startsWith("+") || request.getValorChave().length() != 14) {
                     throw new ResourceNotFoundException("Celular nao segue o padrao");
                 }
             } else if (request.getTipoChave().equals("email")) {
@@ -57,7 +57,6 @@ public class PixServiceImpl implements PixService {
                     throw new ResourceNotFoundException("CPF não segue o padrao");
                 }
             }
-            log.info("PASSSSEI");
             // Verificar se a chave já existe
             var chaveExistente = repository.findByValorChave(request.getValorChave());
             if (chaveExistente.isPresent()) {
@@ -72,7 +71,6 @@ public class PixServiceImpl implements PixService {
 
             // Criar nova chave
             PixChave pixChave = new PixChave();
-            pixChave.setId(UUID.randomUUID());
             pixChave.setTipoChave(request.getTipoChave());
             pixChave.setValorChave(request.getValorChave());
             pixChave.setTipoConta(request.getTipoConta());
@@ -165,19 +163,8 @@ public class PixServiceImpl implements PixService {
             log.info("PIX ATUALIZADO: {}", chave);
             return Optional.of(repository.save(chave.get()));
 
-
-//            PixChaveResponse response = new PixChaveResponse();
-//            response.setTipoConta(chave.get().getTipoConta());
-//            response.setNumeroAgencia(chave.get().getNumeroAgencia());
-//            response.setNumeroConta(chave.get().getNumeroConta());
-//            response.setNomeCorrentista(chave.get().getNomeCorrentista());
-//            response.setSobreNomeCorrentista(chave.get().getSobreNomeCorrentista());
         } catch (Exception ex) {
-            try {
-                throw new Exception(ex.getMessage());
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
+            throw new InvalidDataAccessResourceUsageException(ex.getMessage());
         }
     }
 }

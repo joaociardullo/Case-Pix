@@ -7,7 +7,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import org.antlr.v4.runtime.misc.NotNull;
-import org.hibernate.annotations.GenericGenerator;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -22,7 +21,6 @@ public class PixChave {
 
     @Id
     @GeneratedValue(generator = "UUID")
-    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
     @Column(name = "id", updatable = false, nullable = false)
     private UUID id;
 
@@ -41,6 +39,7 @@ public class PixChave {
 
     private String sobreNomeCorrentista;
 
+    @Column(name = "dataRegistro")
     private LocalDateTime dataRegistro;
 
     public Boolean isInativa() {

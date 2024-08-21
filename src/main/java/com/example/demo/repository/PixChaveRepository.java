@@ -14,6 +14,4 @@ public interface PixChaveRepository extends JpaRepository<PixChave, UUID> {
 
     Optional<PixChave> findByNumeroConta(Integer numeroConta);
 
-    Optional<PixChave> findById(UUID id);
-
 }
