@@ -1,4 +1,4 @@
-package com.example.demo.domain;
+package com.example.demo.domain.response;
 
 import lombok.Data;
 import org.springframework.http.HttpStatus;

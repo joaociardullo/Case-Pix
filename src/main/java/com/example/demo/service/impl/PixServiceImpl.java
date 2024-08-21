@@ -1,9 +1,13 @@
 package com.example.demo.service.impl;
 
-import com.example.demo.domain.ResponseDTO;
 import com.example.demo.domain.entity.PixChave;
 import com.example.demo.domain.request.PixChaveRequest;
 import com.example.demo.domain.response.PixChaveResponse;
+import com.example.demo.domain.response.ResponseDTO;
+import com.example.demo.domain.validator.alterarpix.ValidationStrategy;
+import com.example.demo.domain.validator.alterarpix.ValidationStrategyFactory;
+import com.example.demo.domain.validator.cadastarPix.TipoChaveValidator;
+import com.example.demo.domain.validator.cadastarPix.Validator;
 import com.example.demo.exceptions.IllegalArgumentException;
 import com.example.demo.exceptions.ResourceNotFoundException;
 import com.example.demo.repository.PixChaveRepository;
@@ -26,9 +30,11 @@ public class PixServiceImpl implements PixService {
 
     private static final Logger log = LoggerFactory.getLogger(PixServiceImpl.class);
     private final PixChaveRepository repository;
+    private final Validator validator;
 
-    public PixServiceImpl(PixChaveRepository repository) {
+    public PixServiceImpl(PixChaveRepository repository, Validator validator) {
         this.repository = repository;
+        this.validator = validator;
     }
 
     @Override
@@ -40,30 +46,17 @@ public class PixServiceImpl implements PixService {
                 throw new IllegalArgumentException("Campos obrigatorios");
             }
 
-            if (!Arrays.asList("celular", "email", "cpf", "cnpj", "aleatorio").contains(request.getTipoChave())) {
-                throw new IllegalArgumentException("Tipos de Chaves");
-            }
-            if (request.getTipoChave().equals("celular")) {
-                if (!request.getValorChave().startsWith("+") || request.getValorChave().length() != 14) {
-                    throw new ResourceNotFoundException("Celular nao segue o padrao");
-                }
-            } else if (request.getTipoChave().equals("email")) {
-                if (!request.getValorChave().contains("@") || request.getValorChave().length() > 77) {
-                    throw new ResourceNotFoundException("email não segue o padrao");
-                }
-            } else if (request.getTipoChave().equals("cpf")) {
-                if (request.getValorChave().length() != 11 || !request.getValorChave().matches("\\d+")) {
-                    throw new ResourceNotFoundException("CPF não segue o padrao");
-                }
-            }
+            TipoChaveValidator tipoChaveValidator = validator.getValidator(request.getTipoChave());
+            tipoChaveValidator.validate(request.getValorChave());
+
             var chaveExistente = repository.findByValorChave(request.getValorChave());
             if (chaveExistente.isPresent()) {
                 throw new InvalidDataAccessResourceUsageException("Chave já existente");
             }
 
             var conta = repository.findByNumeroConta(request.getNumeroConta());
-            if (conta.isPresent() && conta.get().getValorChave().length() > 5) {
-                throw new ResourceNotFoundException("Limite de chaves por conta excedido,pessoa fisica");
+            if (conta.isPresent() && conta.get().getValorChave().length() >= 5) {
+                throw new ResourceNotFoundException("Limite de chaves por conta excedido");
             }
 
             PixChave pixChave = new PixChave();
@@ -104,32 +97,9 @@ public class PixServiceImpl implements PixService {
     @Override
     public Optional<PixChave> alterarChavePix(@PathParam("id") UUID id, PixChaveRequest request) {
         try {
-            if (request.getTipoConta() == null || request.getNumeroAgencia() == null || request.getNumeroConta() == null
-                    || request.getNomeCorrentista() == null) {
-                throw new ResourceNotFoundException("Campos obrigatórios não preenchidos");
-            }
 
-            if (!Arrays.asList("corrente", "poupança").contains(request.getTipoConta())) {
-                throw new ResourceNotFoundException("Tipo de conta inválido");
-            }
-
-            String numeroAgencia = Integer.toString(request.getNumeroAgencia());
-            if (!(numeroAgencia.matches("\\d{4}"))) {
-                throw new ResourceNotFoundException("Tipo de agencia invalida");
-            }
-
-            String numeroConta = Integer.toString(request.getNumeroConta());
-            if (!numeroConta.matches("\\d{8}")) {
-                throw new ResourceNotFoundException("Tipo de numero conta invalida");
-            }
-
-            if (request.getNomeCorrentista().length() > 30) {
-                throw new ResourceNotFoundException("");
-            }
-
-            if (request.getSobreNomeCorrentista() != null && request.getSobreNomeCorrentista().length() > 45) {
-                throw new ResourceNotFoundException("Sobrenome do correntista muito longo");
-            }
+            ValidationStrategy validationStrategy = ValidationStrategyFactory.getValidationStrategy(request);
+            validationStrategy.validate(request);
 
             Optional<PixChave> chave = repository.findById(id);
             if (chave.isEmpty()) {

@@ -1,4 +1,4 @@
-package com.example.demo.domain;
+package com.example.demo.domain.response;
 
 import com.example.demo.domain.entity.PixChave;
 import lombok.Builder;
