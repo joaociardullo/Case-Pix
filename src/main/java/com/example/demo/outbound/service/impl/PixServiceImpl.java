@@ -1,15 +1,16 @@
 package com.example.demo.outbound.service.impl;
 
-import com.example.demo.core.repository.domain.entity.PixChave;
-import com.example.demo.core.repository.domain.request.PixChaveRequest;
-import com.example.demo.core.repository.domain.response.PixChaveResponse;
-import com.example.demo.core.repository.domain.response.ResponseDTO;
-import com.example.demo.core.repository.domain.validator.alterarpix.ValidationStrategy;
-import com.example.demo.core.repository.domain.validator.alterarpix.ValidationStrategyFactory;
-import com.example.demo.core.repository.domain.validator.cadastarPix.TipoChaveValidator;
-import com.example.demo.core.repository.domain.validator.cadastarPix.Validator;
-import com.example.demo.core.repository.exceptions.IllegalArgumentException;
-import com.example.demo.core.repository.exceptions.ResourceNotFoundException;
+import com.example.demo.core.domain.entity.PixChave;
+import com.example.demo.core.domain.request.PixChaveRequestDTO;
+import com.example.demo.core.domain.response.PixChaveResponse;
+import com.example.demo.core.domain.response.ResponseDTO;
+import com.example.demo.core.domain.validator.alterarpix.ValidationStrategy;
+import com.example.demo.core.domain.validator.alterarpix.ValidationStrategyFactory;
+import com.example.demo.core.domain.validator.cadastarPix.TipoChaveValidator;
+import com.example.demo.core.domain.validator.cadastarPix.Validator;
+import com.example.demo.core.exceptions.IllegalArgumentException;
+import com.example.demo.core.exceptions.ResourceNotFoundException;
+import com.example.demo.core.mapper.PixMapper;
 import com.example.demo.core.repository.PixChaveRepository;
 import com.example.demo.outbound.service.PixService;
 import jakarta.websocket.server.PathParam;
@@ -31,14 +32,16 @@ public class PixServiceImpl implements PixService {
     private static final Logger log = LoggerFactory.getLogger(PixServiceImpl.class);
     private final PixChaveRepository repository;
     private final Validator validator;
+    private final PixMapper mapper;
 
-    public PixServiceImpl(PixChaveRepository repository, Validator validator) {
+    public PixServiceImpl(PixChaveRepository repository, Validator validator, PixMapper mapper) {
         this.repository = repository;
         this.validator = validator;
+        this.mapper = mapper;
     }
 
     @Override
-    public PixChaveResponse criarChavePix(PixChaveRequest request) throws Exception {
+    public PixChaveResponse criarChavePix(PixChaveRequestDTO request) throws Exception {
 
         try {
             if (request.getTipoChave() == null || request.getValorChave() == null || request.getTipoConta() == null
@@ -59,15 +62,7 @@ public class PixServiceImpl implements PixService {
                 throw new ResourceNotFoundException("Limite de chaves por conta excedido");
             }
 
-            PixChave pixChave = new PixChave();
-            pixChave.setTipoChave(request.getTipoChave());
-            pixChave.setValorChave(request.getValorChave());
-            pixChave.setTipoConta(request.getTipoConta());
-            pixChave.setNumeroAgencia(request.getNumeroAgencia());
-            pixChave.setNumeroConta(request.getNumeroConta());
-            pixChave.setNomeCorrentista(request.getNomeCorrentista());
-            pixChave.setSobreNomeCorrentista(request.getSobreNomeCorrentista());
-            pixChave.setDataRegistro(LocalDateTime.now());
+            PixChave pixChave = mapper.toEntity(request);
             log.info("Dados da chave cadastrado: {} ", pixChave);
             repository.save(pixChave);
 
@@ -90,12 +85,12 @@ public class PixServiceImpl implements PixService {
         response.setNumeroConta(pixChave.getNumeroConta());
         response.setNomeCorrentista(pixChave.getNomeCorrentista());
         response.setSobreNomeCorrentista(pixChave.getSobreNomeCorrentista());
-        response.setDataRegistro(pixChave.getDataRegistro());
+        response.setDataRegistro(LocalDateTime.now());
         return response;
     }
 
     @Override
-    public Optional<PixChave> alterarChavePix(@PathParam("id") UUID id, PixChaveRequest request) {
+    public Optional<PixChave> alterarChavePix(@PathParam("id") UUID id, PixChaveRequestDTO request) {
         try {
 
             ValidationStrategy validationStrategy = ValidationStrategyFactory.getValidationStrategy(request);

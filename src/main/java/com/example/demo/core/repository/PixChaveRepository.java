@@ -1,6 +1,6 @@
 package com.example.demo.core.repository;
 
-import com.example.demo.core.repository.domain.entity.PixChave;
+import com.example.demo.core.domain.entity.PixChave;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

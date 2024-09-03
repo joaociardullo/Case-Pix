@@ -1,8 +1,8 @@
 package com.example.demo.inbound.controller;
 
-import com.example.demo.core.repository.domain.entity.PixChave;
-import com.example.demo.core.repository.domain.request.PixChaveRequest;
-import com.example.demo.core.repository.domain.response.PixChaveResponse;
+import com.example.demo.core.domain.entity.PixChave;
+import com.example.demo.core.domain.request.PixChaveRequestDTO;
+import com.example.demo.core.domain.response.PixChaveResponse;
 import com.example.demo.outbound.service.impl.PixServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -35,7 +35,7 @@ class PixControllerTest {
 
     @Test
     void test_create_pix_key_success() throws Exception {
-        PixChaveRequest request = new PixChaveRequest();
+        PixChaveRequestDTO request = new PixChaveRequestDTO();
         request.setTipoChave("CPF");
         request.setValorChave("12345678900");
         request.setTipoConta("CONTA_CORRENTE");
@@ -66,7 +66,7 @@ class PixControllerTest {
     @Test
     void test_update_pix_key_success() throws Exception {
         UUID id = UUID.randomUUID();
-        PixChaveRequest request = new PixChaveRequest();
+        PixChaveRequestDTO request = new PixChaveRequestDTO();
         request.setTipoChave("EMAIL");
         request.setValorChave("john.doe@example.com");
         request.setTipoConta("CONTA_POUPANCA");
@@ -129,12 +129,12 @@ class PixControllerTest {
 
         PixServiceImpl service = mock(PixServiceImpl.class);
 
-        when(service.alterarChavePix(id, new PixChaveRequest())).thenThrow(new IllegalArgumentException("Chave nￃﾣo encontrada"));
+        when(service.alterarChavePix(id, new PixChaveRequestDTO())).thenThrow(new IllegalArgumentException("Chave nￃﾣo encontrada"));
 
         PixController controller = new PixController(service);
 
         assertThrows(IllegalArgumentException.class, () -> {
-            controller.atulizarPix(id, new PixChaveRequest());
+            controller.atulizarPix(id, new PixChaveRequestDTO());
         });
     }
 }
