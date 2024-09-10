@@ -57,7 +57,7 @@ class PixControllerTest {
 
         PixController controller = new PixController(service);
 
-        PixChaveResponse actualResponse = controller.cadastrar(request);
+        PixChaveResponse actualResponse = controller.cadastrar(request).getBody();
 
         assertEquals(expectedResponse, actualResponse);
     }
@@ -88,7 +88,7 @@ class PixControllerTest {
 
         PixController controller = new PixController(service);
 
-        Optional<PixChave> actualResponse = controller.atulizarPix(id, request);
+        Optional<PixChave> actualResponse = controller.atulizarPix(id, request).getBody();
 
         assertTrue(actualResponse.isPresent());
         assertEquals(pixChave, actualResponse.get());
@@ -118,7 +118,7 @@ class PixControllerTest {
 
         PixController controller = new PixController(service);
 
-        List<PixChave> actualKeys = controller.consultarChaves(id, tipoChave, nomeCorrentista, dataInclusao, dataInativacao);
+        List<PixChave> actualKeys = controller.consultarChaves(id, tipoChave, nomeCorrentista, dataInclusao, dataInativacao).getBody();
 
         assertEquals(expectedKeys, actualKeys);
     }

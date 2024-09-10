@@ -159,4 +159,14 @@ public class PixServiceImpl implements PixService {
 
     }
 
+    public void deletarPix(UUID id) {
+        log.info("Deletar Chave pix: {} ", id);
+        Optional<PixChave> chave = repository.findById(id);
+        if (chave.isPresent()) {
+            repository.deleteAllById(Collections.singleton(id));
+        } else {
+            throw new IllegalArgumentException("ERRO ao deletar chave pix ");
+        }
+
+    }
 }

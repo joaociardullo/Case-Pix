@@ -4,7 +4,10 @@ import com.example.demo.core.domain.entity.PixChave;
 import com.example.demo.core.domain.request.PixChaveRequestDTO;
 import com.example.demo.core.domain.response.PixChaveResponse;
 import com.example.demo.outbound.service.impl.PixServiceImpl;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,27 +25,41 @@ public class PixController {
         this.service = service;
     }
 
+    @ApiOperation("Metodo para cadastrar api")
     @PostMapping(value = "/cadastrar")
-    public PixChaveResponse cadastrar(@RequestBody PixChaveRequestDTO request) throws Exception {
+    @ResponseStatus(HttpStatus.CREATED)
+    public ResponseEntity<PixChaveResponse> cadastrar(@RequestBody PixChaveRequestDTO request) throws Exception {
         log.info("CADASTRAR CHAVE PIX: [{}] ", request);
-        return service.criarChavePix(request);
+        var result = service.criarChavePix(request);
+        return ResponseEntity.ok(result);
     }
 
+    @ApiOperation(value = "Atualizar chave pix")
     @PutMapping(value = "/atualizar/{id}")
-    public Optional<PixChave> atulizarPix(@PathVariable UUID id, @RequestBody PixChaveRequestDTO request) throws Exception {
+    public ResponseEntity<Optional<PixChave>> atulizarPix(@PathVariable UUID id, @RequestBody PixChaveRequestDTO request) throws Exception {
         log.info("ATUALIZAR CHAVE PIX: [{}] ", request);
-        return service.alterarChavePix(id, request);
+        var result = service.alterarChavePix(id, request);
+        return ResponseEntity.ok(result);
     }
 
+    @ApiOperation(value = "Consultar chaves de api")
     @GetMapping(value = "/consultar")
-    public List<PixChave> consultarChaves(@RequestParam(value = "id", required = false) UUID id,
-                                          @RequestParam(value = "tipoChave", required = false) String tipoChave,
-                                          @RequestParam(value = "nomeCorrentista", required = false) String nomeCorrentista,
-                                          @RequestParam(value = "dataInclusao", required = false) String dataInclusao,
-                                          @RequestParam(value = "dataInativacao", required = false) String dataInativacao) {
+    public ResponseEntity<List<PixChave>> consultarChaves(@RequestParam(value = "id", required = false) UUID id,
+                                                          @RequestParam(value = "tipoChave", required = false) String tipoChave,
+                                                          @RequestParam(value = "nomeCorrentista", required = false) String nomeCorrentista,
+                                                          @RequestParam(value = "dataInclusao", required = false) String dataInclusao,
+                                                          @RequestParam(value = "dataInativacao", required = false) String dataInativacao) {
         log.info("CONSULTAR CHAVE PIX: {}", id, tipoChave, nomeCorrentista, dataInclusao, dataInativacao);
-        return service.consultarChavesPix(id, tipoChave, nomeCorrentista, dataInclusao, dataInativacao);
+        var result = service.consultarChavesPix(id, tipoChave, nomeCorrentista, dataInclusao, dataInativacao);
+        return ResponseEntity.ok(result);
+    }
 
 
+    @ApiOperation(value = "Deletar pix", code = 200)
+    @DeleteMapping(value = "/deletar/{id}")
+    public ResponseEntity<?> deletarChavePix(@PathVariable("id") UUID id) {
+        service.deletarPix(id);
+        log.info("Chave Deletada: {}", id);
+        return ResponseEntity.ok().build();
     }
 }
