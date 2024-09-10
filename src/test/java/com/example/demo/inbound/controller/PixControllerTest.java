@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.http.ResponseEntity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,6 +17,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -136,5 +138,30 @@ class PixControllerTest {
         assertThrows(IllegalArgumentException.class, () -> {
             controller.atulizarPix(id, new PixChaveRequestDTO());
         });
+    }
+
+    @Test
+    void test_deletar_pix_key_success() throws Exception {
+        PixChaveRequestDTO request = new PixChaveRequestDTO();
+        request.setTipoChave("CPF");
+        request.setValorChave("12345678900");
+        request.setTipoConta("CONTA_CORRENTE");
+        request.setNumeroAgencia(1234);
+        request.setNumeroConta(56789);
+        request.setNomeCorrentista("John Doe");
+
+        PixChaveResponse expectedResponse = new PixChaveResponse();
+        UUID id = UUID.randomUUID();
+        expectedResponse.setId(id);
+        expectedResponse.setTipoChave("CPF");
+        expectedResponse.setValorChave("12345678900");
+        expectedResponse.setTipoConta("CONTA_CORRENTE");
+        expectedResponse.setNumeroAgencia(1234);
+        expectedResponse.setNumeroConta(56789);
+        expectedResponse.setNomeCorrentista("John Doe");
+
+        ResponseEntity<?> result = controller.deletarChavePix(expectedResponse.getId());
+
+        assertNotNull(result);
     }
 }
